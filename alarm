@@ -1,0 +1,37 @@
+import RPi.GPIO as GPIO
+import time
+import socket
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+GPIO.setup(17, GPIO.OUT)
+GPIO.setup(4, GPIO.OUT)
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(22, GPIO.IN)
+GPIO.setup(6, GPIO.IN)
+
+#HUIS:
+GPIO.output(17, GPIO.HIGH)
+GPIO.output(4, GPIO.LOW)
+GPIO.output(5, GPIO.LOW)
+
+while True:
+    if GPIO.input(22) == True:
+        GPIO.output(17, GPIO.LOW)
+        GPIO.output(4, GPIO.HIGH)
+        teller_tijd = 0
+        teller = 0
+        while teller_tijd < 5:
+            time.sleep(0.5)
+            teller_tijd += 0.5
+            if GPIO.input(6) == True:
+                print("werkt")
+                teller += 1
+                break
+        if teller == 1:
+            GPIO.output(4, GPIO.LOW)
+            GPIO.output(17, GPIO.HIGH)
+        elif teller == 0:
+            GPIO.output(4, GPIO.LOW)
+            GPIO.output(5, GPIO.HIGH)
