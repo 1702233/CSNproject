@@ -5,33 +5,70 @@ import socket
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-GPIO.setup(17, GPIO.OUT)
-GPIO.setup(4, GPIO.OUT)
-GPIO.setup(5, GPIO.OUT)
-GPIO.setup(22, GPIO.IN)
-GPIO.setup(6, GPIO.IN)
+GPIO.setup(17, GPIO.OUT) #groen
+GPIO.setup(4, GPIO.OUT) #geel
+GPIO.setup(5, GPIO.OUT) #rood
+GPIO.setup(13, GPIO.OUT) #buzzer
+GPIO.setup(22, GPIO.IN) #knop alarm aan
+GPIO.setup(6, GPIO.IN) #knop vals alarm, van geel naar groen
+GPIO.setup(19, GPIO.IN) #knop alarm stoppen, van rood naar groen
+
+def buzzer():
+    GPIO.output(13, GPIO.HIGH)
+    time.sleep(0.5)
+    GPIO.output(13, GPIO.LOW)
+    time.sleep(0.5)
+    GPIO.output(13, GPIO.HIGH)
+    time.sleep(0.5)
+    GPIO.output(13, GPIO.LOW)
+    time.sleep(0.5)
+
+while True:
+    buzzer()
+
+#connectie
+s = socket.socket()
+host = "145.89.163.69"
+port = 54321
+s.bind((host, port))
+
+while True:
+    s.listen(5)
+    c, addr = s.accept()
+    print("connectie van", addr)
+    c.send("Er is connectie met de server")
+    c.close()
 
 #HUIS:
 GPIO.output(17, GPIO.HIGH)
 GPIO.output(4, GPIO.LOW)
 GPIO.output(5, GPIO.LOW)
+loopcount = 0
 
 while True:
-    if GPIO.input(22) == True:
-        GPIO.output(17, GPIO.LOW)
-        GPIO.output(4, GPIO.HIGH)
-        teller_tijd = 0
-        teller = 0
-        while teller_tijd < 5:
-            time.sleep(0.5)
-            teller_tijd += 0.5
-            if GPIO.input(6) == True:
-                print("werkt")
-                teller += 1
+    while True:
+        if GPIO.input(22) == True:
+            GPIO.output(17, GPIO.LOW)
+            GPIO.output(4, GPIO.HIGH)
+            teller_tijd = 0
+            teller = 0
+            while teller_tijd < 5:
+                time.sleep(0.5)
+                teller_tijd += 0.5
+                if GPIO.input(6) == True:
+                    teller += 1
+                    break
+            if teller == 1:
+                GPIO.output(4, GPIO.LOW)
+                GPIO.output(17, GPIO.HIGH)
+            elif teller == 0:
+                GPIO.output(4, GPIO.LOW)
+                GPIO.output(5, GPIO.HIGH)
                 break
-        if teller == 1:
-            GPIO.output(4, GPIO.LOW)
+
+    while True:
+        if GPIO.input(19) == True:
+            GPIO.output(5, GPIO.LOW)
             GPIO.output(17, GPIO.HIGH)
-        elif teller == 0:
-            GPIO.output(4, GPIO.LOW)
-            GPIO.output(5, GPIO.HIGH)
+            break
+
