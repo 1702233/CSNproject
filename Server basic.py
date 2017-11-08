@@ -1,14 +1,45 @@
 import socket
+import datetime
+
+print("start")
 s = socket.socket()
-host = "145.89.163.69"
+host = ""
 port = 54321
 s.bind((host, port))
 
+s.listen(2)
+c, addr = s.accept()
+
 while True:
-    s.listen(5)
-    c, addr = s.accept()
-    print("connectie van", addr)
-    c.send(b"Er is connectie met de server")
-    c.close()
-
-
+    ontvangen = c.recv(1024).decode()
+    if ontvangen == "alarm gaat af":
+        print("alarm gaat af")
+        vandaag = datetime.datetime.today()
+        datumtijd = vandaag.strftime("%a %x %X")
+        with open("server.txt", "a") as schrijven:
+            schrijven.write("{:5} - {:5} {}".format("alarm gaat af", datumtijd, "\n"))
+            print(datumtijd)
+    if ontvangen == "vals alarm":
+        print("vals alarm")
+        vandaag = datetime.datetime.today()
+        datumtijd = vandaag.strftime("%a %x %X")
+        with open("server.txt", "a") as schrijven:
+            schrijven.write("{:5} - {:5} {}".format("vals alarm", datumtijd, "\n"))
+            print(datumtijd)
+    if ontvangen == "alarm":
+        print("alarm")
+        vandaag = datetime.datetime.today()
+        datumtijd = vandaag.strftime("%a %x %X")
+        with open("server.txt", "a") as schrijven:
+            schrijven.write("{:5} - {:5} {}".format("alarm", datumtijd, "\n"))
+            print(datumtijd)
+    if ontvangen == "alarm reset":
+        print("alarm reset")
+        vandaag = datetime.datetime.today()
+        datumtijd = vandaag.strftime("%a %x %X")
+        with open("server.txt", "a") as schrijven:
+            schrijven.write("{:5} - {:5} {}".format("alarm reset", datumtijd, "\n"))
+            print(datumtijd)
+    if ontvangen == "break":
+        break
+c.close()
